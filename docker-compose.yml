@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3002:3002"
+    environment:
+      - DATABASE_URL=postgres://postgres:demjan1234@db:5432/docker-task
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: demjan1234
+      POSTGRES_DB: docker-task
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      retries: 5
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
